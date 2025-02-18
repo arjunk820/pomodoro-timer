@@ -1,2 +1,8 @@
-Arjun Kantamsetty
 Pomodoro Timer
+
+How does it work:
+1. Click on the extension
+2. Click `Start` to start the 25 mins session.
+3. If you need to stop and desire to stop the timer, press `Pause`.
+4. When the timer ends, you're given a message urging you to take a break!
+5. Press `Reset` and go again.
