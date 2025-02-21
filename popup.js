@@ -1,56 +1,36 @@
-let timer;
-let timeLeft = 25 * 60;
-let isPaused = true; // tracks if the timer is paused/not
-
 const display = document.getElementById("timer");
 const startPauseButton = document.getElementById("start");
 const resetButton = document.getElementById("reset");
 
 function updateDisplay() {
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
-    display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    chrome.storage.local.get(["timeLeft"], (data) => {
+        let timeLeft = data.timeLeft || 25 * 60;
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    });
 }
 
-function toggleTimer() {
-    if (isPaused) {
-        // Start the timer
-        isPaused = false;
-        startPauseButton.textContent = "Pause"; // Change button text
-        timer = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                updateDisplay();
-            } else {
-                clearInterval(timer);
-                timer = null;
-                isPaused = true;
-                startPauseButton.textContent = "Start";
-                chrome.notifications.create({
-                    type: "basic",
-                    iconUrl: "icon.png",
-                    title: "Time's up!",
-                    message: "Take a break!"
-                });
-            }
-        }, 1000);
-    } else {
-        // Pause the timer
-        isPaused = true;
-        clearInterval(timer);
-        timer = null;
-        startPauseButton.textContent = "Start"; // Change button text
-    }
-}
+// Toggle start/pause
+startPauseButton.addEventListener("click", () => {
+    chrome.storage.local.get(["isRunning"], (data) => {
+        if (data.isRunning) {
+            chrome.runtime.sendMessage({ action: "pause" });
+            startPauseButton.textContent = "Start";
+        } else {
+            chrome.runtime.sendMessage({ action: "start" });
+            startPauseButton.textContent = "Pause";
+        }
+    });
+});
 
-function resetTimer() {
-    clearInterval(timer);
-    timer = null;
-    timeLeft = 25 * 60;
+// Reset timer
+resetButton.addEventListener("click", () => {
+    chrome.runtime.sendMessage({ action: "reset" });
+    startPauseButton.textContent = "Start";
     updateDisplay();
-}
+});
 
-startPauseButton.addEventListener("click", toggleTimer);
-resetButton.addEventListener("click", resetTimer);
-
+// Update display every second
+setInterval(updateDisplay, 1000);
 updateDisplay();

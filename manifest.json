@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Pomodoro Timer",
   "version": "1.0",
-  "description": "A simple Pomodoro timer for productivity.",
+  "description": "A simple Pomodoro timer that runs in the background.",
   "permissions": ["storage", "alarms", "notifications"],
   "action": {
     "default_popup": "popup.html",
